@@ -91,7 +91,7 @@ func orderedRoll(b *tb.Bot, m *tb.Message){
 		outputStr += "\n"
 	}
 
-	b.Send(m.Sender, outputStr)
+	b.Send(m.Chat, outputStr)
 }
 
 func unorderedRoll(b *tb.Bot, m *tb.Message){
@@ -137,7 +137,7 @@ func unorderedRoll(b *tb.Bot, m *tb.Message){
 			outputStr += "Total Score: "
 			outputStr += strconv.Itoa(totalScore)
 
-			b.Send(m.Sender, outputStr)
+			b.Send(m.Chat, outputStr)
 		}
 		fmt.Println (outputStr)
 		fmt.Println ("~~ Current total score: ")
