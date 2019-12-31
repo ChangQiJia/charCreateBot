@@ -97,16 +97,9 @@ func orderedRoll(b *tb.Bot, m *tb.Message){
 func unorderedRoll(b *tb.Bot, m *tb.Message){
 	rand.Seed(time.Now().UTC().UnixNano())
 	
-	totalScore := 0
-	outputStr := ""
 	var reroll = true; 
 
 	for reroll {
-		fmt.Println ("~~ SCORE BEFORE REROLLING : ")
-		fmt.Println (strconv.Itoa(totalScore))
-		fmt.Println ("=====")
-		fmt.Println ("~~ Rerolling!")
-
 		outputStr := ""
 		totalScore := 0
 		
@@ -134,19 +127,21 @@ func unorderedRoll(b *tb.Bot, m *tb.Message){
 			}
 			
 			totalScore += eachScore
-			fmt.Println ("~~ Current total score: ")
-			fmt.Println (strconv.Itoa(totalScore))
 			outputStr += "\n"
 		}
 
 		if (totalScore >= 70 && totalScore <= 75){
-			fmt.Println ("~~ Finally ")
+
 			reroll=false
+
+			outputStr += "Total Score: "
+			outputStr += strconv.Itoa(totalScore)
+
+			b.Send(m.Sender, outputStr)
 		}
+		fmt.Println (outputStr)
+		fmt.Println ("~~ Current total score: ")
+		fmt.Println (strconv.Itoa(totalScore))
 	}
-
-	outputStr += "Total Score: "
-	outputStr += strconv.Itoa(totalScore)
-
-	b.Send(m.Sender, outputStr)
+	
 }
