@@ -101,7 +101,8 @@ func unorderedRoll(b *tb.Bot, m *tb.Message){
 	outputStr := ""
 
 	for ok := true; ok; ok = (totalScore < 70 || totalScore > 75) {
-		
+		fmt.Println ("~~ SCORE BEFORE REROLLING : ")
+		fmt.Println (strconv.Itoa(totalScore))
 		fmt.Println ("=====")
 		fmt.Println ("~~ Rerolling!")
 
@@ -131,9 +132,9 @@ func unorderedRoll(b *tb.Bot, m *tb.Message){
 				}
 			}
 			
+			totalScore += eachScore
 			fmt.Println ("~~ Current total score: ")
 			fmt.Println (strconv.Itoa(totalScore))
-			totalScore += eachScore
 			outputStr += "\n"
 		}
 	}
