@@ -29,7 +29,8 @@ func main(){
 	
 	fmt.Println ("~~ Creating bot")
 
-    b, err := tb.NewBot(pref)
+	b, err := tb.NewBot(pref)
+	
     if err != nil {
 		fmt.Println ("~~ Oh No!")
         log.Fatal(err)
@@ -38,5 +39,7 @@ func main(){
 	b.Handle("/hello", func(m *tb.Message) {
 		b.Send(m.Sender, "Hi!")
 	})
+
+	b.Start()
 	
 }
