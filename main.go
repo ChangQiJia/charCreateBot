@@ -57,7 +57,7 @@ func main(){
 
 func help(b *tb.Bot, m *tb.Message){
 	outputStr := ""
-	outputStr += "For ordered rolls please enter /ordered \n For unordered rolls please enter /unordered"
+	outputStr += "For ordered rolls please enter /ordered \nFor unordered rolls please enter /unordered"
 	b.Send(m.Sender, outputStr)
 }
 
@@ -101,7 +101,9 @@ func unorderedRoll(b *tb.Bot, m *tb.Message){
 	outputStr := ""
 
 	for ok := true; ok; ok = (totalScore < 70 || totalScore > 75) {
-	
+		
+		fmt.Println ("~~ Rerolling!")
+		
 		outputStr := ""
 		totalScore := 0
 		
@@ -128,10 +130,12 @@ func unorderedRoll(b *tb.Bot, m *tb.Message){
 				}
 			}
 			
+			fmt.Println ("~~ Current total score")
 			totalScore += eachScore
 			outputStr += "\n"
 		}
 	}
+
 	outputStr += "Total Score: "
 	outputStr += strconv.Itoa(totalScore)
 
