@@ -58,7 +58,7 @@ func main(){
 func help(b *tb.Bot, m *tb.Message){
 	outputStr := ""
 	outputStr += "For ordered rolls please enter /ordered \nFor unordered rolls please enter /unordered"
-	b.Send(m.Sender, outputStr)
+	b.Send(m.Chat, outputStr)
 }
 
 func orderedRoll(b *tb.Bot, m *tb.Message){
