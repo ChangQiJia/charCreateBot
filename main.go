@@ -161,12 +161,17 @@ func unorderedRoll(b *tb.Bot, m *tb.Message){
 func critSuccess(b *tb.Bot, m *tb.Message){
 
 	s := strings.Split(m.Payload, " ")
+	fmt.Println (s)
 	critType, critValue := s[0], s[1]
+
+	fmt.Println (critType)
+	fmt.Println (critValue)
 
 	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	
 	if err != nil {
 		log.Fatal(err)
+		fmt.Println (err)
 	}
 
 	var (
@@ -175,10 +180,13 @@ func critSuccess(b *tb.Bot, m *tb.Message){
 	)
 
 	rows, err := db.Query("select Effect, Description from users where Crit_Type = ? amd min <= ? and max >= ?" , critType, critValue, critValue)
+	
 	if err != nil {
 		log.Fatal(err)
+		fmt.Println (err)
 	}
 	defer rows.Close()
+
 	for rows.Next() {
 		err := rows.Scan(&effect, &description)
 		if err != nil {
@@ -189,6 +197,7 @@ func critSuccess(b *tb.Bot, m *tb.Message){
 	err = rows.Err()
 	if err != nil {
 		log.Fatal(err)
+		fmt.Println (err)
 	}
 
 	outputStr := "Description: "
