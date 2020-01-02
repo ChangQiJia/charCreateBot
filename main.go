@@ -8,6 +8,8 @@ import (
 	"math/rand"
 	"time"
 	"strconv"
+	"database/sql"
+	"strings"
 )
 
 func main(){
@@ -49,6 +51,10 @@ func main(){
 
 	b.Handle("/unordered", func(m *tb.Message) {
 		unorderedRoll(b, m)
+	})
+
+	b.Handle("/crit", func(m *tb.Message) {
+		critSuccess(b, m)
 	})
 
 	b.Start()
@@ -98,6 +104,7 @@ func unorderedRoll(b *tb.Bot, m *tb.Message){
 	rand.Seed(time.Now().UTC().UnixNano())
 	
 	var reroll = true; 
+	var valid = false; 
 
 	for reroll {
 		outputStr := ""
@@ -126,11 +133,15 @@ func unorderedRoll(b *tb.Bot, m *tb.Message){
 				}
 			}
 			
+			if (eachScore >= 15){
+				valid = true
+			}
+
 			totalScore += eachScore
 			outputStr += "\n"
 		}
 
-		if (totalScore >= 70 && totalScore <= 75){
+		if (totalScore >= 70 && totalScore <= 75 && valid){
 
 			reroll=false
 
@@ -144,4 +155,47 @@ func unorderedRoll(b *tb.Bot, m *tb.Message){
 		fmt.Println (strconv.Itoa(totalScore))
 	}
 	
+}
+
+func critSuccess(b *tb.Bot, m *tb.Message){
+
+	s := strings.Split(m.Payload, " ")
+	critType, critValue := s[0], s[1]
+
+	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var (
+		effect string
+		description string
+	)
+
+	rows, err := db.Query("select Effect, Description from users where Crit_Type = ? amd min <= ? and max >= ?" , critType, critValue, critValue)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&effect, &description)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(effect, description)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	outputStr := "Description: "
+	outputStr += description
+	outputStr += "\n"
+	outputStr += "Effect: "
+	outputStr += effect
+
+	b.Send(m.Chat, outputStr)
+
 }
