@@ -179,7 +179,7 @@ func critSuccess(b *tb.Bot, m *tb.Message){
 		description string
 	)
 
-	rows, err := db.Query("select Effect, Description from Crit where Crit_Type = ? and Min <= ? and Max >= ?" , critType, critValue, critValue)
+	rows, err := db.Query("select Effect, Description from Crit where Crit_Type = 'spells' and Min <= 5 and Max >= 5" , critType, critValue, critValue)
 	
 	if err != nil {
 		log.Fatal(err)
