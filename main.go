@@ -181,6 +181,8 @@ func critSuccess(b *tb.Bot, m *tb.Message){
 		fmt.Println (err)
 	}
 
+	defer db.Close()
+
 	var (
 		effect string
 		description string
