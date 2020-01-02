@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"database/sql"
 	"strings"
+	_ "github.com/lib/pq"
 )
 
 func main(){
