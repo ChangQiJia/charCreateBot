@@ -36,6 +36,13 @@ func main(){
 	fmt.Println ("~~ Creating bot")
 
 	b, err := tb.NewBot(pref)
+
+	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	
+	if err != nil {
+		log.Fatal(err)
+		fmt.Println (err)
+	}
 	
     if err != nil {
 		fmt.Println ("~~ Oh No!")
@@ -55,11 +62,11 @@ func main(){
 	})
 
 	b.Handle("/crit", func(m *tb.Message) {
-		critSuccess(b, m)
+		critSuccess(b, m, db)
 	})
 
 	b.Handle("/critFail", func(m *tb.Message) {
-		critFail(b, m)
+		critFail(b, m, db)
 	})
 
 	b.Start()
@@ -164,7 +171,7 @@ func unorderedRoll(b *tb.Bot, m *tb.Message){
 	
 }
 
-func critSuccess(b *tb.Bot, m *tb.Message){
+func critSuccess(b *tb.Bot, m *tb.Message, db *sql.DB){
 
 	s := strings.Split(m.Payload, " ")
 	fmt.Println (s)
@@ -173,15 +180,6 @@ func critSuccess(b *tb.Bot, m *tb.Message){
 	fmt.Println (critType)
 	fmt.Println (critValue)
 	i1, _ := strconv.Atoi(critValue)
-
-	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
-	
-	if err != nil {
-		log.Fatal(err)
-		fmt.Println (err)
-	}
-
-	defer db.Close()
 
 	var (
 		effect string
@@ -219,7 +217,7 @@ func critSuccess(b *tb.Bot, m *tb.Message){
 
 }
 
-func critFail(b *tb.Bot, m *tb.Message){
+func critFail(b *tb.Bot, m *tb.Message, db *sql.DB){
 
 	s := strings.Split(m.Payload, " ")
 	fmt.Println (s)
@@ -228,13 +226,6 @@ func critFail(b *tb.Bot, m *tb.Message){
 	fmt.Println (critType)
 	fmt.Println (critValue)
 	i1, _ := strconv.Atoi(critValue)
-
-	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
-	
-	if err != nil {
-		log.Fatal(err)
-		fmt.Println (err)
-	}
 
 	var (
 		effect string
