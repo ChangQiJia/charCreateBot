@@ -166,6 +166,7 @@ func critSuccess(b *tb.Bot, m *tb.Message){
 
 	fmt.Println (critType)
 	fmt.Println (critValue)
+	i1, _ := strconv.Atoi(critValue)
 
 	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	
@@ -179,7 +180,7 @@ func critSuccess(b *tb.Bot, m *tb.Message){
 		description string
 	)
 
-	rows, err := db.Query("select \"Effect\", \"Description\" from public.\"Crit\" where \"Crit_Type\" = ? and \"Min\" <= ? and \"Max\" >= ?" , critType, critValue, critValue)
+	rows, err := db.Query("select \"Effect\", \"Description\" from public.\"Crit\" where \"Crit_Type\" = $1 and \"Min\" <= $2 and \"Max\" >= $2" , critType, i1)
 	
 	if err != nil {
 		log.Fatal(err)
