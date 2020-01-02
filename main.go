@@ -69,6 +69,8 @@ func main(){
 func help(b *tb.Bot, m *tb.Message){
 	outputStr := ""
 	outputStr += "For ordered rolls please enter /ordered \nFor unordered rolls please enter /unordered"
+	outputStr += "\nFor crit success please enter /crit followed by Spell or Attack follow by a space and a number example /crit Spell 20"
+	outputStr += "\nFor crit fails please enter /critFail followed by Spell or Attack follow by a space and a number example /critFail Attack 90"
 	b.Send(m.Chat, outputStr)
 }
 
