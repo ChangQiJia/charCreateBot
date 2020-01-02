@@ -58,6 +58,10 @@ func main(){
 		critSuccess(b, m)
 	})
 
+	b.Handle("/critFail", func(m *tb.Message) {
+		critFail(b, m)
+	})
+
 	b.Start()
 	
 }
@@ -203,7 +207,60 @@ func critSuccess(b *tb.Bot, m *tb.Message){
 
 	outputStr := "Description: "
 	outputStr += description
-	outputStr += "\n"
+	outputStr += "\n\n"
+	outputStr += "Effect: "
+	outputStr += effect
+
+	b.Send(m.Chat, outputStr)
+
+}
+
+func critFail(b *tb.Bot, m *tb.Message){
+
+	s := strings.Split(m.Payload, " ")
+	fmt.Println (s)
+	critType, critValue := s[0], s[1]
+
+	fmt.Println (critType)
+	fmt.Println (critValue)
+	i1, _ := strconv.Atoi(critValue)
+
+	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	
+	if err != nil {
+		log.Fatal(err)
+		fmt.Println (err)
+	}
+
+	var (
+		effect string
+		description string
+	)
+
+	rows, err := db.Query("select \"Effect\", \"Description\" from public.\"CritFail\" where \"Crit_Type\" = $1 and \"Min\" <= $2 and \"Max\" >= $2" , critType, i1)
+	
+	if err != nil {
+		log.Fatal(err)
+		fmt.Println (err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&effect, &description)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(effect, description)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+		fmt.Println (err)
+	}
+
+	outputStr := "Description: "
+	outputStr += description
+	outputStr += "\n\n"
 	outputStr += "Effect: "
 	outputStr += effect
 
