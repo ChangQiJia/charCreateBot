@@ -396,13 +396,16 @@ func rollHealth(b *tb.Bot, m *tb.Message){
 
 			if (index == 1){
 				output += "Your result = ("
-				output += strconv.Itoa(hpDice)
+				output += strconv.Itoa(hpDice + conMod)
 				totalHealth += (hpDice + conMod)
 				numberOfRolls -= 1
 			}
 			
 			for roll:=0 ; roll < numberOfRolls; roll++{
 					hp := rand.Intn(hpDice)+1
+
+					fmt.Print ("Hp Roll : ")
+					fmt.Println (hp)
 
 					hp += conMod
 
