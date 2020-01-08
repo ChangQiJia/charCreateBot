@@ -383,8 +383,6 @@ func rollHealth(b *tb.Bot, m *tb.Message){
 	conMod,_ := strconv.Atoi(s[0])
 	totalHealth := 0
 
-	length := len (s)
-
 	output := ""
 
 	for index, value := range s {
