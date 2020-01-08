@@ -222,7 +222,7 @@ func getSuggestion (first int, second int) string{
 		}
 	}
 
-	output += ", ranger"
+	output += ", Ranger"
 
 	return output
 
