@@ -431,12 +431,16 @@ func getClassHP (name string) int{
 	className := strings.ToLower(name)
 
 	if (className == "wiz" || className == "sorc"){
+		fmt.Println (className + " : 6")
 		return 6
 	}else if (className == "bard" || className == "cleric" || className == "druid" || className == "monk" || className == "rogue" || className == "war" || className == "arti"){
+		fmt.Println (className + " : 8")
 		return 8
 	}else if(className == "fighter" || className == "pala" || className == "rang"){
+		fmt.Println (className + " : 10")
 		return 10
 	}else if (className == "barb"){
+		fmt.Println (className + " : 12")
 		return 12
 	}else{
 		return 0
