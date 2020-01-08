@@ -69,6 +69,15 @@ func main(){
 		critFail(b, m, db)
 	})
 
+	b.Handle("/health", func(m *tb.Message) {
+		rollHealth(b, m)
+	})
+
+	b.Handle("/classname", func(m *tb.Message) {
+		getClassNames(b, m)
+	})
+
+
 	b.Start()
 	
 }
@@ -78,6 +87,8 @@ func help(b *tb.Bot, m *tb.Message){
 	outputStr += "For ordered rolls please enter /ordered \nFor unordered rolls please enter /unordered"
 	outputStr += "\nFor crit success please enter /crit followed by Spell or Attack follow by a space and a number example /crit Spell 20"
 	outputStr += "\nFor crit fails please enter /critFail followed by Spell or Attack follow by a space and a number example /critFail Attack 90"
+	outputStr += "\nFor rolling health please enter /health follow by con mod and how you level your characther , example /health 2 rog:3 pal:5"
+	outputStr += "\nFor class abbreviations please enter /classname"
 	b.Send(m.Chat, outputStr)
 }
 
@@ -210,6 +221,8 @@ func getSuggestion (first int, second int) string{
 			output += "Bard-ric"
 		}
 	}
+
+	output += ", ranger"
 
 	return output
 
@@ -362,4 +375,76 @@ func critFail(b *tb.Bot, m *tb.Message, db *sql.DB){
 
 	b.Send(m.Chat, outputStr)
 
+}
+
+func rollHealth(b *tb.Bot, m *tb.Message){
+
+	s := strings.Split(m.Payload, " ")
+	conMod,_ := strconv.Atoi(s[0])
+	totalHealth := 0
+
+	length := len (s)
+
+	output := ""
+
+	for index, value := range s {
+		
+		if index != 0{
+
+			classHpString := strings.Split (value, ":")
+
+			hpDice := getClassHP(classHpString[0])
+			numberOfRolls,_ := strconv.Atoi(classHpString[1])
+
+			if (index == 1){
+				output += "Your result = ("
+				output += strconv.Itoa(hpDice)
+				totalHealth += (hpDice + conMod)
+				numberOfRolls -= 1
+			}
+			
+			for roll:=0 ; roll < numberOfRolls; roll++{
+					hp := rand.Intn(hpDice)+1
+
+					hp += conMod
+
+					if (hp < 0){
+						hp = 1
+					}
+
+					totalHealth += hp
+
+					output += " + "
+					output += strconv.Itoa(hp)
+				}
+		}
+	}
+
+	output += " ) = "
+	output += strconv.Itoa(totalHealth)
+	b.Send(m.Chat, output)
+}
+
+func getClassHP (name string) int{
+
+	className := strings.ToLower(name)
+
+	if (className == "wiz" || className == "sorc"){
+		return 6
+	}else if (className == "bard" || className == "cleric" || className == "druid" || className == "monk" || className == "rogue" || className == "war" || className == "arti"){
+		return 8
+	}else if(className == "fighter" || className == "pala" || className == "rang"){
+		return 10
+	}else if (className == "barb"){
+		return 12
+	}else{
+		return 0
+	}
+}
+
+func getClassNames (b *tb.Bot, m *tb.Message){
+
+	outputStr := "These are the only short forms: \n\tArtificer = arti \n\tBarbarian = barb \n\tPaladin = pala \n\tRanger = rang \n\tSorcerer = sorc \n\tWarlock = war \n\t Wizard = wiz"
+
+	b.Send(m.Chat, outputStr)
 }
