@@ -449,7 +449,7 @@ func getClassHP (name string) int{
 
 func getClassNames (b *tb.Bot, m *tb.Message){
 
-	outputStr := "These are the only short forms: \n\tArtificer = arti \n\tBarbarian = barb \n\tPaladin = pala \n\tRanger = rang \n\tSorcerer = sorc \n\tWarlock = war \n\t Wizard = wiz"
+	outputStr := "These are the only short forms: \n    Artificer = arti \n    Barbarian = barb \n    Paladin = pala \n    Ranger = rang \n    Sorcerer = sorc \n    Warlock = war \n    Wizard = wiz"
 
 	b.Send(m.Chat, outputStr)
 }
