@@ -84,6 +84,10 @@ func help(b *tb.Bot, m *tb.Message){
 func orderedRoll(b *tb.Bot, m *tb.Message){
 	rand.Seed(time.Now().UTC().UnixNano())
 	outputStr := ""
+	largestAmount := 0
+	secondAmount := 0
+	largestIndex := -1
+	secondIndex := -1
 
 	for i:= 0; i<6 ;i++{
 		eachScore := 0
@@ -108,10 +112,107 @@ func orderedRoll(b *tb.Bot, m *tb.Message){
 			}
 		}
 
+		if (eachScore > largestAmount){
+			secondAmount = largestAmount
+			secondIndex = largestIndex
+
+			largestAmount = eachScore
+			largestIndex = i
+		}else if (eachScore > secondAmount){
+			secondAmount = eachScore
+			secondIndex = i
+		}
+
 		outputStr += "\n"
 	}
 
+	suggestion := getSuggestion (largestIndex, secondIndex)
+
+	outputStr += "\n"
+	outputStr += suggestion
+
 	b.Send(m.Chat, outputStr)
+}
+
+func getSuggestion (first int, second int) string{
+	output := "Suggestion: "
+
+	if (first == 0){
+		if (second == 1){
+			output += "Barbarian"
+		}else if (second == 2){
+			output += "Fighter"
+		}else if (second == 3){
+			output += "Eldritch Knight"
+		}else if (second == 4){
+			output += "Ranger"
+		}else if (second == 5){
+			output += "Bard-barian"
+		}
+	}else if (first == 1){
+		if (second == 0){
+			output += "Rogue-barian"
+		}else if (second == 2){
+			output += "Monk"
+		}else if (second == 3){
+			output += "Arcane Trickster"
+		}else if (second == 4){
+			output += "DruidMonk"
+		}else if (second == 5){
+			output += "Roga-din"
+		}
+	}else if (first == 2){
+		if (second == 0){
+			output += "Barbarian"
+		}else if (second == 1){
+			output += "Ranged Fighter"
+		}else if (second == 3){
+			output += "Wizard"
+		}else if (second == 4){
+			output += "Cleric"
+		}else if (second == 5){
+			output += "Sorc"
+		}
+	}else if (first == 3){
+		if (second == 0){
+			output += "Artificer"
+		}else if (second == 1){
+			output += "BladeSinger"
+		}else if (second == 2){
+			output += "Mystic"
+		}else if (second == 4){
+			output += "WizardCleric"
+		}else if (second == 5){
+			output += "Wiz-Sorc"
+		}
+	}else if (first == 4){
+		if (second == 0){
+			output += "War Cleric"
+		}else if (second == 1){
+			output += "Ranger"
+		}else if (second == 2){
+			output += "Druid"
+		}else if (second == 3){
+			output += "Druid"
+		}else if (second == 5){
+			output += "Cleric Warlock (Child of divorced patrons)"
+		}
+	}else if (first == 5){
+		if (second == 0){
+			output += "Hexadin"
+		}else if (second == 1){
+			output += "Bard"
+		}else if (second == 2){
+			output += "Sorc-lock"
+		}else if (second == 3){
+			output += "Wiz-lock"
+		}else if (second == 4){
+			output += "Bard-ric"
+		}
+	}
+
+	return output
+
 }
 
 func unorderedRoll(b *tb.Bot, m *tb.Message){
