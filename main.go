@@ -65,7 +65,7 @@ func main(){
 		critSuccess(b, m, db)
 	})
 
-	b.Handle("/critFail", func(m *tb.Message) {
+	b.Handle("/fail", func(m *tb.Message) {
 		critFail(b, m, db)
 	})
 
@@ -86,7 +86,7 @@ func help(b *tb.Bot, m *tb.Message){
 	outputStr := ""
 	outputStr += "For ordered rolls please enter /ordered \nFor unordered rolls please enter /unordered"
 	outputStr += "\nFor crit success please enter /crit followed by Spell or Attack follow by a space and a number example /crit Spell 20\n"
-	outputStr += "\nFor crit fails please enter /critFail followed by Spell or Attack follow by a space and a number example /critFail Attack 90\n"
+	outputStr += "\nFor crit fails please enter /fail followed by Spell or Attack follow by a space and a number example /critFail Attack 90\n"
 	outputStr += "\nFor rolling health please enter /health follow by con mod and how you level your characther , example /health 2 rogue:3 pala:5, please note you can only enter 9 different classes max\n"
 	outputStr += "\nFor class abbreviations please enter /classname"
 	b.Send(m.Chat, outputStr)
