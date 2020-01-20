@@ -290,6 +290,7 @@ func critSuccess(b *tb.Bot, m *tb.Message, db *sql.DB){
 	s := strings.Split(m.Payload, " ")
 	fmt.Println (s)
 	critType, critValue := s[0], s[1]
+	critType = strings.Title(strings.ToLower(critType))
 
 	fmt.Println (critType)
 	fmt.Println (critValue)
@@ -336,6 +337,7 @@ func critFail(b *tb.Bot, m *tb.Message, db *sql.DB){
 	s := strings.Split(m.Payload, " ")
 	fmt.Println (s)
 	critType, critValue := s[0], s[1]
+	critType = strings.Title(strings.ToLower(critType))
 
 	fmt.Println (critType)
 	fmt.Println (critValue)
