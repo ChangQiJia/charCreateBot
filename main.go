@@ -78,8 +78,8 @@ func main() {
 		getClassNames(b, m)
 	})
 
-	b.Handle("/test", func(m *tb.Message) {
-		scheduleMsg(b, m)
+	b.Handle("/roll", func(m *tb.Message) {
+		roll(b, m)
 	})
 
 	b.Start()
@@ -460,8 +460,47 @@ func getClassNames(b *tb.Bot, m *tb.Message) {
 	b.Send(m.Chat, outputStr)
 }
 
-func scheduleMsg(b *tb.Bot, m *tb.Message) {
-	outputStr := ""
-	outputStr += m.Time()
-	b.Send(m.Chat, outputStr)
+func roll(b *tb.Bot, m *tb.Message) {
+	s := strings.Split(m.Payload, " ")
+
+	output := ""
+	totalRoll := 0
+
+	for index, value := range s {
+		diceAndRolls := strings.Split(value, ":")
+
+		if index == 0 {
+			output += "Your result = "
+		}
+
+		dice, _ := strconv.Atoi(diceAndRolls[0])
+
+		numberOfRolls := 0
+		if len(diceAndRolls) < 1 {
+			numberOfRolls = 1
+		} else {
+			tempNum, err := strconv.Atoi(diceAndRolls[1])
+
+			if err != nil {
+				tempNum = 1
+			}
+			numberOfRolls = tempNum
+		}
+
+		for roll := 0; roll < numberOfRolls; roll++ {
+			if roll == 0 {
+				output += "("
+			}
+			eachRoll := rand.Intn(dice) + 1
+			totalRoll += eachRoll
+			output += strconv.Itoa(eachRoll)
+
+			if roll < numberOfRolls-1 {
+				output += ", "
+			}
+
+			output += ") "
+		}
+	}
+
 }
