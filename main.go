@@ -471,7 +471,7 @@ func roll(b *tb.Bot, m *tb.Message) {
 		diceAndRolls := strings.Split(value, ":")
 
 		if index == 0 {
-			output += "Your result = "
+			output += "Your rolls : "
 		}
 
 		dice, _ := strconv.Atoi(diceAndRolls[0])
@@ -505,8 +505,9 @@ func roll(b *tb.Bot, m *tb.Message) {
 		output += ") "
 
 	}
-
-	outputStr := strconv.Itoa(totalRoll)
+	outputStr := "Your total rolls: "
+	outputStr += strconv.Itoa(totalRoll)
+	outputStr += "\n"
 	outputStr += output
 
 	b.Send(m.Chat, outputStr)
