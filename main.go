@@ -503,4 +503,6 @@ func roll(b *tb.Bot, m *tb.Message) {
 		}
 	}
 
+	b.Send(m.Chat, output)
+
 }
