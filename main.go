@@ -1,52 +1,53 @@
-package main 
+package main
 
 import (
-	"os"
-	"log"
-	"fmt"
-	tb "gopkg.in/tucnak/telebot.v2"	
-	"math/rand"
-	"time"
-	"strconv"
 	"database/sql"
+	"fmt"
+	"log"
+	"math/rand"
+	"os"
+	"strconv"
 	"strings"
+	"time"
+
 	_ "github.com/lib/pq"
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
-func main(){
-	
-	fmt.Println ("~~ Starting App")
+func main() {
+
+	fmt.Println("~~ Starting App")
 
 	var (
-        port      = os.Getenv("PORT")       // sets automatically
-        publicURL = os.Getenv("PUBLIC_URL") // you must add it to your config vars
-        token     = os.Getenv("TOKEN")      // you must add it to your config vars
+		port      = os.Getenv("PORT")       // sets automatically
+		publicURL = os.Getenv("PUBLIC_URL") // you must add it to your config vars
+		token     = os.Getenv("TOKEN")      // you must add it to your config vars
 	)
-	
+
 	webhook := &tb.Webhook{
-        Listen:   ":" + port,
-        Endpoint: &tb.WebhookEndpoint{PublicURL: publicURL},
+		Listen:   ":" + port,
+		Endpoint: &tb.WebhookEndpoint{PublicURL: publicURL},
 	}
-	
+
 	pref := tb.Settings{
-        Token:  token,
-        Poller: webhook,
+		Token:  token,
+		Poller: webhook,
 	}
-	
-	fmt.Println ("~~ Creating bot")
+
+	fmt.Println("~~ Creating bot")
 
 	b, err := tb.NewBot(pref)
 
 	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
-	
+
 	if err != nil {
 		log.Fatal(err)
-		fmt.Println (err)
+		fmt.Println(err)
 	}
-	
-    if err != nil {
-		fmt.Println ("~~ Oh No!")
-        log.Fatal(err)
+
+	if err != nil {
+		fmt.Println("~~ Oh No!")
+		log.Fatal(err)
 	}
 
 	b.Handle("/help", func(m *tb.Message) {
@@ -77,12 +78,15 @@ func main(){
 		getClassNames(b, m)
 	})
 
+	b.Handle("/test", func(m *tb.Message) {
+		scheduleMsg(b, m)
+	})
 
 	b.Start()
-	
+
 }
 
-func help(b *tb.Bot, m *tb.Message){
+func help(b *tb.Bot, m *tb.Message) {
 	outputStr := ""
 	outputStr += "For ordered rolls please enter /ordered \nFor unordered rolls please enter /unordered"
 	outputStr += "\nFor crit success please enter /crit followed by Spell or Attack follow by a space and a number example /crit Spell 20\n"
@@ -92,7 +96,7 @@ func help(b *tb.Bot, m *tb.Message){
 	b.Send(m.Chat, outputStr)
 }
 
-func orderedRoll(b *tb.Bot, m *tb.Message){
+func orderedRoll(b *tb.Bot, m *tb.Message) {
 	rand.Seed(time.Now().UTC().UnixNano())
 	outputStr := ""
 	largestAmount := 0
@@ -100,36 +104,36 @@ func orderedRoll(b *tb.Bot, m *tb.Message){
 	largestIndex := -1
 	secondIndex := -1
 
-	for i:= 0; i<6 ;i++{
+	for i := 0; i < 6; i++ {
 		eachScore := 0
 		min := 10
 		outputStr += "("
-		
-		for roll:=0 ; roll < 4; roll++{
-			oneDsix := rand.Intn(6)+1
-			if (oneDsix < min){
+
+		for roll := 0; roll < 4; roll++ {
+			oneDsix := rand.Intn(6) + 1
+			if oneDsix < min {
 				min = oneDsix
 			}
 			eachScore += oneDsix
 
 			outputStr += strconv.Itoa(oneDsix)
 
-			if (roll < 3){
+			if roll < 3 {
 				outputStr += " + "
-			}else{
+			} else {
 				outputStr += ") = "
 				eachScore -= min
 				outputStr += strconv.Itoa(eachScore)
 			}
 		}
 
-		if (eachScore > largestAmount){
+		if eachScore > largestAmount {
 			secondAmount = largestAmount
 			secondIndex = largestIndex
 
 			largestAmount = eachScore
 			largestIndex = i
-		}else if (eachScore > secondAmount){
+		} else if eachScore > secondAmount {
 			secondAmount = eachScore
 			secondIndex = i
 		}
@@ -137,7 +141,7 @@ func orderedRoll(b *tb.Bot, m *tb.Message){
 		outputStr += "\n"
 	}
 
-	suggestion := getSuggestion (largestIndex, secondIndex)
+	suggestion := getSuggestion(largestIndex, secondIndex)
 
 	outputStr += "\n"
 	outputStr += suggestion
@@ -145,79 +149,79 @@ func orderedRoll(b *tb.Bot, m *tb.Message){
 	b.Send(m.Chat, outputStr)
 }
 
-func getSuggestion (first int, second int) string{
+func getSuggestion(first int, second int) string {
 	output := "Suggestion: "
 
-	if (first == 0){
-		if (second == 1){
+	if first == 0 {
+		if second == 1 {
 			output += "Barbarian"
-		}else if (second == 2){
+		} else if second == 2 {
 			output += "Fighter"
-		}else if (second == 3){
+		} else if second == 3 {
 			output += "Eldritch Knight"
-		}else if (second == 4){
+		} else if second == 4 {
 			output += "Ranger"
-		}else if (second == 5){
+		} else if second == 5 {
 			output += "Bard-barian"
 		}
-	}else if (first == 1){
-		if (second == 0){
+	} else if first == 1 {
+		if second == 0 {
 			output += "Rogue-barian"
-		}else if (second == 2){
+		} else if second == 2 {
 			output += "Monk"
-		}else if (second == 3){
+		} else if second == 3 {
 			output += "Arcane Trickster"
-		}else if (second == 4){
+		} else if second == 4 {
 			output += "DruidMonk"
-		}else if (second == 5){
+		} else if second == 5 {
 			output += "Roga-din"
 		}
-	}else if (first == 2){
-		if (second == 0){
+	} else if first == 2 {
+		if second == 0 {
 			output += "Barbarian"
-		}else if (second == 1){
+		} else if second == 1 {
 			output += "Ranged Fighter"
-		}else if (second == 3){
+		} else if second == 3 {
 			output += "Wizard"
-		}else if (second == 4){
+		} else if second == 4 {
 			output += "Cleric"
-		}else if (second == 5){
+		} else if second == 5 {
 			output += "Sorc"
 		}
-	}else if (first == 3){
-		if (second == 0){
+	} else if first == 3 {
+		if second == 0 {
 			output += "Artificer"
-		}else if (second == 1){
+		} else if second == 1 {
 			output += "BladeSinger"
-		}else if (second == 2){
+		} else if second == 2 {
 			output += "Mystic"
-		}else if (second == 4){
+		} else if second == 4 {
 			output += "WizardCleric"
-		}else if (second == 5){
+		} else if second == 5 {
 			output += "Wiz-Sorc"
 		}
-	}else if (first == 4){
-		if (second == 0){
+	} else if first == 4 {
+		if second == 0 {
 			output += "War Cleric"
-		}else if (second == 1){
+		} else if second == 1 {
 			output += "Ranger"
-		}else if (second == 2){
+		} else if second == 2 {
 			output += "Druid"
-		}else if (second == 3){
+		} else if second == 3 {
 			output += "Druid"
-		}else if (second == 5){
+		} else if second == 5 {
 			output += "Cleric Warlock (Child of divorced patrons)"
 		}
-	}else if (first == 5){
-		if (second == 0){
+	} else if first == 5 {
+		if second == 0 {
 			output += "Hexadin"
-		}else if (second == 1){
+		} else if second == 1 {
 			output += "Bard"
-		}else if (second == 2){
+		} else if second == 2 {
 			output += "Sorc-lock"
-		}else if (second == 3){
+		} else if second == 3 {
 			output += "Wiz-lock"
-		}else if (second == 4){
+		} else if second == 4 {
 			output += "Bard-ric"
 		}
 	}
@@ -228,40 +232,40 @@ func getSuggestion (first int, second int) string{
 
 }
 
-func unorderedRoll(b *tb.Bot, m *tb.Message){
+func unorderedRoll(b *tb.Bot, m *tb.Message) {
 	rand.Seed(time.Now().UTC().UnixNano())
-	
-	var reroll = true; 
-	var valid = false; 
+
+	var reroll = true
+	var valid = false
 
 	for reroll {
 		outputStr := ""
 		totalScore := 0
-		
-		for i:= 0; i<6 ;i++{
+
+		for i := 0; i < 6; i++ {
 			eachScore := 0
 			min := 10
 			outputStr += "("
-			
-			for roll:=0 ; roll < 4; roll++{
-				oneDsix := rand.Intn(6)+1
-				if (oneDsix < min){
+
+			for roll := 0; roll < 4; roll++ {
+				oneDsix := rand.Intn(6) + 1
+				if oneDsix < min {
 					min = oneDsix
 				}
 				eachScore += oneDsix
 
 				outputStr += strconv.Itoa(oneDsix)
 
-				if (roll < 3){
+				if roll < 3 {
 					outputStr += " + "
-				}else{
+				} else {
 					outputStr += ") = "
 					eachScore -= min
 					outputStr += strconv.Itoa(eachScore)
 				}
 			}
-			
-			if (eachScore >= 15){
+
+			if eachScore >= 15 {
 				valid = true
 			}
 
@@ -269,43 +273,43 @@ func unorderedRoll(b *tb.Bot, m *tb.Message){
 			outputStr += "\n"
 		}
 
-		if (totalScore >= 70 && totalScore <= 75 && valid){
+		if totalScore >= 70 && totalScore <= 75 && valid {
 
-			reroll=false
+			reroll = false
 
 			outputStr += "Total Score: "
 			outputStr += strconv.Itoa(totalScore)
 
 			b.Send(m.Chat, outputStr)
 		}
-		fmt.Println (outputStr)
-		fmt.Println ("~~ Current total score: ")
-		fmt.Println (strconv.Itoa(totalScore))
+		fmt.Println(outputStr)
+		fmt.Println("~~ Current total score: ")
+		fmt.Println(strconv.Itoa(totalScore))
 	}
-	
+
 }
 
-func critSuccess(b *tb.Bot, m *tb.Message, db *sql.DB){
+func critSuccess(b *tb.Bot, m *tb.Message, db *sql.DB) {
 
 	s := strings.Split(m.Payload, " ")
-	fmt.Println (s)
+	fmt.Println(s)
 	critType, critValue := s[0], s[1]
 	critType = strings.Title(strings.ToLower(critType))
 
-	fmt.Println (critType)
-	fmt.Println (critValue)
+	fmt.Println(critType)
+	fmt.Println(critValue)
 	i1, _ := strconv.Atoi(critValue)
 
 	var (
-		effect string
+		effect      string
 		description string
 	)
 
-	rows, err := db.Query("select \"Effect\", \"Description\" from public.\"Crit\" where \"Crit_Type\" = $1 and \"Min\" <= $2 and \"Max\" >= $2" , critType, i1)
-	
+	rows, err := db.Query("select \"Effect\", \"Description\" from public.\"Crit\" where \"Crit_Type\" = $1 and \"Min\" <= $2 and \"Max\" >= $2", critType, i1)
+
 	if err != nil {
 		log.Fatal(err)
-		fmt.Println (err)
+		fmt.Println(err)
 	}
 	defer rows.Close()
 
@@ -319,7 +323,7 @@ func critSuccess(b *tb.Bot, m *tb.Message, db *sql.DB){
 	err = rows.Err()
 	if err != nil {
 		log.Fatal(err)
-		fmt.Println (err)
+		fmt.Println(err)
 	}
 
 	outputStr := "Description: "
@@ -332,27 +336,27 @@ func critSuccess(b *tb.Bot, m *tb.Message, db *sql.DB){
 
 }
 
-func critFail(b *tb.Bot, m *tb.Message, db *sql.DB){
+func critFail(b *tb.Bot, m *tb.Message, db *sql.DB) {
 
 	s := strings.Split(m.Payload, " ")
-	fmt.Println (s)
+	fmt.Println(s)
 	critType, critValue := s[0], s[1]
 	critType = strings.Title(strings.ToLower(critType))
 
-	fmt.Println (critType)
-	fmt.Println (critValue)
+	fmt.Println(critType)
+	fmt.Println(critValue)
 	i1, _ := strconv.Atoi(critValue)
 
 	var (
-		effect string
+		effect      string
 		description string
 	)
 
-	rows, err := db.Query("select \"Effect\", \"Description\" from public.\"CritFail\" where \"Crit_Type\" = $1 and \"Min\" <= $2 and \"Max\" >= $2" , critType, i1)
-	
+	rows, err := db.Query("select \"Effect\", \"Description\" from public.\"CritFail\" where \"Crit_Type\" = $1 and \"Min\" <= $2 and \"Max\" >= $2", critType, i1)
+
 	if err != nil {
 		log.Fatal(err)
-		fmt.Println (err)
+		fmt.Println(err)
 	}
 	defer rows.Close()
 
@@ -366,7 +370,7 @@ func critFail(b *tb.Bot, m *tb.Message, db *sql.DB){
 	err = rows.Err()
 	if err != nil {
 		log.Fatal(err)
-		fmt.Println (err)
+		fmt.Println(err)
 	}
 
 	outputStr := "Description: "
@@ -379,47 +383,47 @@ func critFail(b *tb.Bot, m *tb.Message, db *sql.DB){
 
 }
 
-func rollHealth(b *tb.Bot, m *tb.Message){
+func rollHealth(b *tb.Bot, m *tb.Message) {
 
 	s := strings.Split(m.Payload, " ")
-	conMod,_ := strconv.Atoi(s[0])
+	conMod, _ := strconv.Atoi(s[0])
 	totalHealth := 0
 
 	output := ""
 
 	for index, value := range s {
-		
-		if index != 0{
 
-			classHpString := strings.Split (value, ":")
+		if index != 0 {
+
+			classHpString := strings.Split(value, ":")
 
 			hpDice := getClassHP(classHpString[0])
-			numberOfRolls,_ := strconv.Atoi(classHpString[1])
+			numberOfRolls, _ := strconv.Atoi(classHpString[1])
 
-			if (index == 1){
+			if index == 1 {
 				output += "Your result = ("
 				output += strconv.Itoa(hpDice + conMod)
 				totalHealth += (hpDice + conMod)
-				numberOfRolls -= 1
+				numberOfRolls--
 			}
-			
-			for roll:=0 ; roll < numberOfRolls; roll++{
-					hp := rand.Intn(hpDice)+1
 
-					fmt.Print ("Hp Roll : ")
-					fmt.Println (hp)
+			for roll := 0; roll < numberOfRolls; roll++ {
+				hp := rand.Intn(hpDice) + 1
 
-					hp += conMod
+				fmt.Print("Hp Roll : ")
+				fmt.Println(hp)
 
-					if (hp <= 0){
-						hp = 1
-					}
+				hp += conMod
 
-					totalHealth += hp
-
-					output += " + "
-					output += strconv.Itoa(hp)
+				if hp <= 0 {
+					hp = 1
 				}
+
+				totalHealth += hp
+
+				output += " + "
+				output += strconv.Itoa(hp)
+			}
 		}
 	}
 
@@ -428,30 +432,36 @@ func rollHealth(b *tb.Bot, m *tb.Message){
 	b.Send(m.Chat, output)
 }
 
-func getClassHP (name string) int{
+func getClassHP(name string) int {
 
 	className := strings.ToLower(name)
 
-	if (className == "wiz" || className == "sorc"){
-		fmt.Println (className + " : 6")
+	if className == "wiz" || className == "sorc" {
+		fmt.Println(className + " : 6")
 		return 6
-	}else if (className == "bard" || className == "cleric" || className == "druid" || className == "monk" || className == "rogue" || className == "war" || className == "arti"){
-		fmt.Println (className + " : 8")
+	} else if className == "bard" || className == "cleric" || className == "druid" || className == "monk" || className == "rogue" || className == "war" || className == "arti" {
+		fmt.Println(className + " : 8")
 		return 8
-	}else if(className == "fighter" || className == "pala" || className == "rang"){
-		fmt.Println (className + " : 10")
+	} else if className == "fighter" || className == "pala" || className == "rang" {
+		fmt.Println(className + " : 10")
 		return 10
-	}else if (className == "barb"){
-		fmt.Println (className + " : 12")
+	} else if className == "barb" {
+		fmt.Println(className + " : 12")
 		return 12
-	}else{
+	} else {
 		return 0
 	}
 }
 
-func getClassNames (b *tb.Bot, m *tb.Message){
+func getClassNames(b *tb.Bot, m *tb.Message) {
 
 	outputStr := "These are the only short forms: \n    Artificer = arti \n    Barbarian = barb \n    Paladin = pala \n    Ranger = rang \n    Sorcerer = sorc \n    Warlock = war \n    Wizard = wiz"
 
+	b.Send(m.Chat, outputStr)
+}
+
+func scheduleMsg(b *tb.Bot, m *tb.Message) {
+	outputStr := ""
+	outputStr += m.Time()
 	b.Send(m.Chat, outputStr)
 }
