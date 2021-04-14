@@ -476,7 +476,7 @@ func roll(b *tb.Bot, m *tb.Message) {
 		dice, _ := strconv.Atoi(diceAndRolls[0])
 
 		numberOfRolls := 0
-		if len(diceAndRolls) < 1 {
+		if len(diceAndRolls) < 2 {
 			numberOfRolls = 1
 		} else {
 			tempNum, err := strconv.Atoi(diceAndRolls[1])
@@ -499,8 +499,9 @@ func roll(b *tb.Bot, m *tb.Message) {
 				output += ", "
 			}
 
-			output += ") "
 		}
+
+		output += ") "
 	}
 
 	b.Send(m.Chat, output)
