@@ -93,7 +93,7 @@ func help(b *tb.Bot, m *tb.Message) {
 	outputStr += "\nFor crit fails please enter /fail followed by Spell or Attack follow by a space and a number example /fail Attack 90\n"
 	outputStr += "\nFor rolling health please enter /health follow by con mod and how you level your characther , example /health 2 rogue:3 pala:5, please note you can only enter 9 different classes max\n"
 	outputStr += "\nFor class abbreviations please enter /classname\n"
-	outputStr += "\nFor rolls please enter /roll followed by dice:number of rolls. example /roll 6:2 10:2 will roll d6 2 times followed by a d10 2 times"
+	outputStr += "\nFor rolls please enter /roll followed by number of rolls<d>dice . example /roll 2d6 d4 2d10 will roll d6 2 times followed by d4 once and then a d10 2 times"
 	b.Send(m.Chat, outputStr)
 }
 
@@ -478,7 +478,7 @@ func roll(b *tb.Bot, m *tb.Message) {
 
 		numberOfRolls := 0
 		if len(diceAndRolls[0]) > 0 {
-			tempNum, err := strconv.Atoi(diceAndRolls[1])
+			tempNum, err := strconv.Atoi(diceAndRolls[0])
 
 			if err != nil {
 				tempNum = 1
