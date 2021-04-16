@@ -468,24 +468,24 @@ func roll(b *tb.Bot, m *tb.Message) {
 	totalRoll := 0
 
 	for index, value := range s {
-		diceAndRolls := strings.Split(value, ":")
+		diceAndRolls := strings.Split(value, "d")
 
 		if index == 0 {
 			output += "Your rolls : "
 		}
 
-		dice, _ := strconv.Atoi(diceAndRolls[0])
+		dice, _ := strconv.Atoi(diceAndRolls[1])
 
 		numberOfRolls := 0
-		if len(diceAndRolls) < 2 {
-			numberOfRolls = 1
-		} else {
+		if len(diceAndRolls[0]) > 0 {
 			tempNum, err := strconv.Atoi(diceAndRolls[1])
 
 			if err != nil {
 				tempNum = 1
 			}
 			numberOfRolls = tempNum
+		} else {
+			numberOfRolls = 1
 		}
 
 		for roll := 0; roll < numberOfRolls; roll++ {
