@@ -385,7 +385,7 @@ func critFail(b *tb.Bot, m *tb.Message, db *sql.DB) {
 }
 
 func rollHealth(b *tb.Bot, m *tb.Message) {
-
+	rand.Seed(time.Now().UTC().UnixNano())
 	s := strings.Split(m.Payload, " ")
 	conMod, _ := strconv.Atoi(s[0])
 	totalHealth := 0
@@ -462,6 +462,7 @@ func getClassNames(b *tb.Bot, m *tb.Message) {
 }
 
 func roll(b *tb.Bot, m *tb.Message) {
+	rand.Seed(time.Now().UTC().UnixNano())
 	s := strings.Split(m.Payload, " ")
 
 	output := ""
